@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35913.81 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFCSV", "CFCSV.csproj", "{F23FF318-9C33-4FFF-BE16-D2135B9BDA65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFCSV.TestClient", "..\CFCSV.TestClient\CFCSV.TestClient.csproj", "{BB58BE9C-279C-48DE-8279-F7E6FF7C0BAD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F23FF318-9C33-4FFF-BE16-D2135B9BDA65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F23FF318-9C33-4FFF-BE16-D2135B9BDA65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F23FF318-9C33-4FFF-BE16-D2135B9BDA65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F23FF318-9C33-4FFF-BE16-D2135B9BDA65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB58BE9C-279C-48DE-8279-F7E6FF7C0BAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB58BE9C-279C-48DE-8279-F7E6FF7C0BAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB58BE9C-279C-48DE-8279-F7E6FF7C0BAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB58BE9C-279C-48DE-8279-F7E6FF7C0BAD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4689BDBB-B7D2-4ED4-B9D7-E4E02B1C67C0}
+	EndGlobalSection
+EndGlobal
