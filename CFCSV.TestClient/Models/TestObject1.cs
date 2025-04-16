@@ -17,5 +17,7 @@
         public Int64 Int64Value { get; set; }        
 
         public string StringValue { get; set; } = String.Empty;
+
+        public string? StringValueNullable { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CFCSV.Models;
 using CFCSV.Reader;
 using CFCSV.TestClient.Models;
+using CFCSV.Utilities;
 using System.Text;
 
 namespace CFCSV.TestClient
@@ -11,81 +12,31 @@ namespace CFCSV.TestClient
     internal class CSVEntityReaderTest
     {
         public void Run(string file)
-        {
-            var csvSettings = new CSVSettings()
+        {           
+            Char quotes = '"';
+          
+            var csvReader = new CSVEntityReader<TestObject1>()
             {
-                 Delimiter = (Char)9,
-                 Encoding = Encoding.UTF8,
-                 Filename = file,
-                 Columns = new List<CSVColumn>()
-                 {
-                     new CSVColumn()
-                     {
-                          Name = "Id",
-                          DataType = typeof(String),
-                          ValueQuoted = false
-                     },
-                     new CSVColumn()
-                     {
-                          Name = "DateTimeOffsetValue",
-                          DataType = typeof(DateTimeOffset),
-                          ValueQuoted = true
-                     },
-                     new CSVColumn()
-                     {
-                          Name = "Int16Value",
-                          DataType = typeof(Int16),
-                          ValueQuoted = false
-                     },
-                     new CSVColumn()
-                     {
-                          Name = "Int32Value",
-                          DataType = typeof(Int32),
-                          ValueQuoted = false
-                     },
-                     new CSVColumn()
-                     {
-                          Name = "Int32ValueNullable",
-                          DataType = typeof(Int32?),
-                          ValueQuoted = false
-                     },
-                     new CSVColumn()
-                     {
-                          Name = "Int64Value",
-                          DataType = typeof(Int64),
-                          ValueQuoted = false
-                     },
-                       new CSVColumn()
-                     {
-                          Name = "BooleanValue",
-                          DataType = typeof(Boolean),
-                          ValueQuoted = false
-                     },
-                         new CSVColumn()
-                     {
-                          Name = "StringValue",
-                          DataType = typeof(String),
-                          ValueQuoted = true
-                     },
-                 }
+                File = file,
+                Delimiter = (Char)9,
+                Encoding = Encoding.UTF8
             };
 
-            // Read CSV
-            var csvReader = new CSVEntityReader<TestObject1>();
-            var testObjects = csvReader.Read(csvSettings, (values) =>
-            {                
-                return new TestObject1()
-                {
-                    Id = (string)values[0],
-                    DateTimeOffsetValue  = (DateTimeOffset)values[1],
-                    Int16Value = (Int16)values[2],
-                    Int32Value = (Int32)values[3],
-                    Inv32ValueNullable = (Int32?)values[4],
-                    Int64Value = (Int64)values[5],
-                    BooleanValue = (Boolean)values[6],
-                    StringValue = (String)values[7],
-                };
-            });
+            // Set property mappings
+            var nullString = "null";
+            csvReader.AddPropertyMapping<String>(e => e.Id, (headers, values) => values[0]);
+            csvReader.AddPropertyMapping<DateTimeOffset>(e => e.DateTimeOffsetValue, (headers, values) => DateTimeOffset.Parse(CSVUtilities.RemoveOuterQuotes(values[1], quotes)));
+            csvReader.AddPropertyMapping<Int16>(e => e.Int16Value, (headers, values) => Convert.ToInt16(values[2]));
+            csvReader.AddPropertyMapping<Int32>(e => e.Int32Value, (headers, values) => Convert.ToInt32(values[3]));
+            csvReader.AddPropertyMapping<Int32?>(e => e.Inv32ValueNullable, (headers, values) => values[4].Equals(nullString) ? null : Convert.ToInt32(values[4]));
+            csvReader.AddPropertyMapping<Int64>(e => e.Int64Value, (headers, values) => Convert.ToInt64(values[5]));
+            csvReader.AddPropertyMapping<Boolean>(e => e.BooleanValue, (headers, values) => Convert.ToBoolean(values[6]));
+            csvReader.AddPropertyMapping<String>(e => e.StringValue, (headers, values) => CSVUtilities.RemoveOuterQuotes(values[7], quotes));
+            // null value written without quotes (Has quotes when loaded), "null" literal will have another set of quotes
+            csvReader.AddPropertyMapping<String?>(e => e.StringValueNullable, (headers, values) => values[8].Equals(nullString) ? null : CSVUtilities.RemoveOuterQuotes(values[8], quotes));
+
+            // Read objects
+            var testObjects = csvReader.Read(() => new TestObject1());
 
             int xxxxxx = 1000;
         }

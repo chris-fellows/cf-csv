@@ -17,6 +17,10 @@ namespace CFCSV.Writer
             string GetValue<T>(T entity);
         }
 
+        /// <summary>
+        /// Mapping between CSV column and entity property
+        /// </summary>
+        /// <typeparam name="TMySourceType"></typeparam>
         private class ColumnMapping<TMySourceType> : IColumnMapping
         {           
             public string Name { get; internal set; }
@@ -61,10 +65,8 @@ namespace CFCSV.Writer
                                            Expression<Func<TEntity, TSourceType>> sourceProperty,
                                            Expression<Func<TSourceType, string>> destinationProperty)
 
-        {
-            var columnMapping = new ColumnMapping<TSourceType>(name, sourceProperty, destinationProperty);
-
-            _columnMappings.Add(columnMapping);
+        {            
+            _columnMappings.Add(new ColumnMapping<TSourceType>(name, sourceProperty, destinationProperty));
         }
 
         public void Write(IEnumerable<TEntity> entities)

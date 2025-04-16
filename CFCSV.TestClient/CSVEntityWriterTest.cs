@@ -30,7 +30,9 @@ namespace CFCSV.TestClient
                     Int32Value = 1021,
                     Inv32ValueNullable = null,
                     Int64Value = 1022,
-                    StringValue = "Test value"                    
+                    StringValue = "Test Value",
+                    StringValueNullable = null
+                    //StringValueNullable = "null"
                 };
                 testObjects.Add(testObject);
             }
@@ -44,15 +46,18 @@ namespace CFCSV.TestClient
 
             // Set column mappings
             var quotes = '"';
+            var nullString = "null";
             csvWriter.AddColumn<string>("Id", u => u.Id, value => value.ToString());
             csvWriter.AddColumn<DateTimeOffset>("DateTimeOffsetValue", u => u.DateTimeOffsetValue, value => $"{quotes}{value.ToString()}{quotes}");
             csvWriter.AddColumn<Int16>("Int16Value", u => u.Int16Value, value => value.ToString());
             csvWriter.AddColumn<Int32>("Int32Value", u => u.Int32Value, value => value.ToString());
-            csvWriter.AddColumn<Int32?>("Int32ValueNullable", u => u.Inv32ValueNullable, value => value.HasValue ? value.ToString() : "");
+            csvWriter.AddColumn<Int32?>("Int32ValueNullable", u => u.Inv32ValueNullable, value => value == null ? nullString : value.ToString());
             csvWriter.AddColumn<Int64>("Int64Value", u => u.Int64Value, value => value.ToString());
             csvWriter.AddColumn<Boolean>("BooleanValue", u => u.BooleanValue, value => value.ToString());
-            csvWriter.AddColumn<String>("StringValue", u => u.StringValue, value => $"{quotes}{value}{quotes}");
+            csvWriter.AddColumn<String>("StringValue", u => u.StringValue, value => $"{quotes}{value.ToString()}{quotes}");
+            csvWriter.AddColumn<String?>("StringValueNullable", u => u.StringValueNullable, value => value == null ? nullString : $"{quotes}{value.ToString()}{quotes}");
 
+            // Write to CSV
             csvWriter.Write(testObjects);
         }
     }
