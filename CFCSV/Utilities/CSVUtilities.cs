@@ -157,5 +157,19 @@ namespace CFCSV.Utilities
 
             return columnValues;
         }
+
+        public static Char? GetDelimiter(string line)
+        {
+            List<Char> delimiters = new List<char>() { (Char)9, ',', '|', '#' };
+            for (int index = 0; index < line.Length; index++)
+            {
+                int delimiterIndex = delimiters.IndexOf(line[index]);
+                if (delimiterIndex != -1)
+                {
+                    return delimiters[delimiterIndex];
+                }
+            }
+            return null;
+        }
     }
 }

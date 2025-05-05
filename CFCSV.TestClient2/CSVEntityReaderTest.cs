@@ -36,35 +36,13 @@ namespace CFCSV.TestClient
             csvReader.AddPropertyMapping<String?>(e => e.StringValueNullable, (headers, values) => values[8].Equals(nullString) ? null : CSVUtilities.RemoveOuterQuotes(values[8], quotes));
 
             // Read objects
-            var testObjects = csvReader.Read(() => new TestObject1());
+            //var testObjects = csvReader.Read(() => new TestObject1());
+            foreach(var testObject in csvReader.Read(() => new TestObject1()))
+            {
+                int zzzz = 10000;
+            }
 
             int xxxxxx = 1000;
-        }
-
-        public void ReadDictionaryObjects(string file)
-        {
-            Char quotes = '"';
-
-            var csvReader = new CSVEntityReader<Dictionary<string, object>>()
-            {
-                File = file,
-                Delimiter = (Char)9,
-                Encoding = Encoding.UTF8
-            };
-
-            // Set property mappings
-            var nullString = "null";
-            csvReader.AddPropertyMapping<object>(e => e["Id"], (headers, values) => values[0]);
-            csvReader.AddPropertyMapping<object>(e => e["Inv32ValueNullable"], (headers, values) => values[4].Equals(nullString) ? null : Convert.ToInt32(values[4]));
-
-            // Read objects
-            var testObjects = csvReader.Read(() => new Dictionary<string, object>()
-            {
-                { "Id", null },
-                { "Inv32ValueNullable", null }
-            });
-
-            int xxxxxx = 1000;
-        }
+        }      
     }
 }

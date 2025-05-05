@@ -1,23 +1,26 @@
-﻿using CFCSV.Models;
-using CFCSV.Utilities;
+﻿using CFCSV.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CFCSV.Reader
 {
     /// <summary>
-    /// Reads CSV to list of type T
+    /// Reads CSV and returns Dictionary per row, key is column name
     /// </summary>
-    public class CSVEntityReader<TEntity>
+    public class CSVDictionaryReader
     {
         private interface IPropertyMapping
-        {            
+        {
             /// <summary>
             /// Sets property value for entity
             /// </summary>
             /// <param name="entity"></param>
             /// <param name="values"></param>
-            void SetValue(TEntity entity, List<string> headers, List<string> values);
+            void SetValue(Dictionary<string, object> entity, List<string> headers, List<string> values);
         }
 
         /// <summary>
@@ -26,7 +29,7 @@ namespace CFCSV.Reader
         /// </summary>
         /// <typeparam name="TMySourceType"></typeparam>
         private class PropertyMapping<TMySourceType> : IPropertyMapping
-        {            
+        {
             /// <summary>
             /// Expression to convert CSV value(s) to entity property value
             /// </summary>
@@ -35,24 +38,34 @@ namespace CFCSV.Reader
             /// <summary>
             /// Expression to return entity property to set
             /// </summary>
-            public Expression<Func<TEntity, TMySourceType>> EntityProperty { get; internal set; }
+            public string DictionaryKey { get; internal set; }
 
             public PropertyMapping(Expression<Func<List<string>, List<string>, TMySourceType>> valuesProperty,
-                           Expression<Func<TEntity, TMySourceType>> entityProperty)
-            {                
+                                   string dictionaryKey)
+            {
                 ValuesProperty = valuesProperty;
-                EntityProperty = entityProperty;
+                DictionaryKey = dictionaryKey;
             }
 
-            public void SetValue(TEntity entity, List<string> headers, List<string> values)
+            public void SetValue(Dictionary<string, object> entity, List<string> headers, List<string> values)
             {
                 // Get property value from column value(s)
                 var valuesFunction = ValuesProperty.Compile();
                 var propertyValue = valuesFunction(headers, values);
 
                 // Set entity property
-                var entityPropertyInfo = EntityProperty.GetPropertyInfo();
-                entityPropertyInfo.SetValue(entity, (TMySourceType)propertyValue);
+                //var result = EntityProperty.Compile();
+                //var item = result();
+                entity[DictionaryKey] = propertyValue;
+
+                //var propertyCompiled = EntityProperty.Compile();
+                //var result= propertyCompiled.Invoke(entity);
+                //result = propertyValue;
+
+                int xxx = 1000;
+
+                //var entityPropertyInfo = EntityProperty.GetPropertyInfo();
+                //entityPropertyInfo.SetValue(entity, (TMySourceType)propertyValue);
             }
         }
 
@@ -60,17 +73,11 @@ namespace CFCSV.Reader
 
         public string File { get; set; } = string.Empty;
         public char Delimiter { get; set; } = (char)9;
-        public Encoding Encoding { get; set; } = Encoding.UTF8;       
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
-        /// <summary>
-        /// Reads CSV. Method either returns list of entities
-        /// </summary>
-        /// <param name="createEntity"></param>
-        /// <param name="enumerateAction"></param>
-        /// <returns></returns>
-        public IEnumerable<TEntity> Read(Expression<Func<TEntity>> createEntity)                                  
+        public IEnumerable<Dictionary<string, object>> Read(Expression<Func<Dictionary<string, object>>> createEntity)
         {
-            //List<TEntity> items = new List<TEntity>();
+            //var items = new List<Dictionary<string, object>>();
 
             using (StreamReader reader = new StreamReader(File))
             {
@@ -92,37 +99,37 @@ namespace CFCSV.Reader
                         headers = CSVUtilities.GetColumnValueStrings(line, Delimiter, quotes);
                     }
                     else     // Row
-                    {                        
+                    {
                         // Get CSV column values
                         var values = CSVUtilities.GetColumnValueStrings(line, Delimiter, quotes);
 
                         // Set entity properties
-                        var entity = createEntityFunction.Invoke();
+                        var entity = createEntityFunction.Invoke();                        
                         foreach (IPropertyMapping propertyMapping in _propertyMappings)
                         {
                             propertyMapping.SetValue(entity, headers, values);
                         }
 
                         yield return entity;
-                                                
-                        //items.Add(entity);                        
+
+                        //items.Add(entity);
                     }
                 }
             }
 
             //return items;
-        }      
+        }
 
         /// <summary>
         /// Adds mapping between entity property and CSV values
         /// </summary>
         /// <typeparam name="TSourceType"></typeparam>
-        /// <param name="entityProperty"></param>
-        /// <param name="valuesProperty"></param>
-        public void AddPropertyMapping<TSourceType>(Expression<Func<TEntity, TSourceType>> entityProperty,
-                                                Expression<Func<List<string>, List<string>, TSourceType>> valuesProperty)                                           
-        {            
-            _propertyMappings.Add(new PropertyMapping<TSourceType>(valuesProperty, entityProperty));
+        /// <param name="dictionaryKey">Dictionary key</param>
+        /// <param name="valuesProperty">Expression to return dictionary value from CSV headers and row values</param>
+        public void AddPropertyMapping<TSourceType>(string dictionaryKey,
+                                            Expression<Func<List<string>, List<string>, TSourceType>> valuesProperty)
+        {
+            _propertyMappings.Add(new PropertyMapping<TSourceType>(valuesProperty, dictionaryKey));
         }
     }
 }

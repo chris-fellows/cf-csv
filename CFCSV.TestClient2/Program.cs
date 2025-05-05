@@ -1,6 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CFCSV.TestClient;
-using CFCSV.Utilities;
+using CFCSV.TestClient2;
+using CFCSV.Writer;
+//using CFCSV.Utilities;
 
 Console.WriteLine("Hello, World!");
 
@@ -17,10 +19,10 @@ var dictionaryObjectsFile = @"D:\\Test\\CSVTest\\TestObjectsDictionary.txt";
 var objectArrayObjectsFile = @"D:\\Test\\CSVTest\\TestObjectsObjectArray.txt";
 
 //new CSVEntityWriterTest().WriteCustomObjects(customObjectsFile);
-new CSVEntityWriterTest().WriteDictionaryObjects(dictionaryObjectsFile);
-//new CSVEntityWriterTest().WriteObjectArrayObjects(objectArrayObjectsFile);
-
 //new CSVEntityReaderTest().ReadCustomObjects(customObjectsFile);
-new CSVEntityReaderTest().ReadDictionaryObjects(dictionaryObjectsFile);
+
+new CSVDictionaryWriterTest().WriteDictionaryObjects(dictionaryObjectsFile);
+
+new CSVDictionaryReaderTest().ReadDictionaryObjects(dictionaryObjectsFile);
 
 int xxx = 1000;

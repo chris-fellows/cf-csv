@@ -1,55 +1,47 @@
-﻿using CFCSV.Utilities;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CFCSV.Writer
 {
     /// <summary>
-    /// CSV writer for custom objects
+    /// CSV for dictionary objects. Each row is a Dictionary<string, object>
     /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public class CSVEntityWriter<TEntity>
+    public class CSVDictionaryWriter
     {
         private interface IColumnMapping
         {
             string Name { get; }
 
-            string GetValue(TEntity entity);
+            string GetValue<T>(Dictionary<string, object> entity);
         }
 
         /// <summary>
         /// Mapping between CSV column and entity property
         /// </summary>
         /// <typeparam name="TMySourceType"></typeparam>
-        private class ColumnMapping : IColumnMapping
+        private class ColumnMapping<TMySourceType> : IColumnMapping
         {
             public string Name { get; internal set; }
-
-            //public Expression<Func<TEntity, TMySourceType>> SourceProperty { get; internal set; }
-
-            public Expression<Func<TEntity, string>> DestinationProperty { get; internal set; }
+            
+            public Expression<Func<Dictionary<string, object>, string>> DestinationProperty { get; internal set; }
 
             public ColumnMapping(string name,                           
-                           Expression<Func<TEntity, string>> destinationProperty)
+                           Expression<Func<Dictionary<String, object>, string>> destinationProperty)
             {
                 Name = name;                
                 DestinationProperty = destinationProperty;
             }
 
-            public string GetValue(TEntity entity)
-            {
+            public string GetValue<T>(Dictionary<string, object> entity)
+            {                                
                 var destinationPropertyCompiled = DestinationProperty.Compile();
                 var result = destinationPropertyCompiled(entity);
-                return result;
-
-                /*
-                var propertyInfo = SourceProperty.GetPropertyInfo();
-
-                var propertyValue = (TMySourceType)propertyInfo.GetValue(entity);
-
-                var myFunction = DestinationProperty.Compile();
-                return myFunction(propertyValue);
-                */
+                return result;                
             }
         }
 
@@ -59,17 +51,11 @@ namespace CFCSV.Writer
         public char Delimiter { get; set; } = (char)9;
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
-        /// <summary>
-        /// Adds column
-        /// </summary>
-        /// <typeparam name="TSourceType"></typeparam>
-        /// <param name="sourceProperty"></param>
-        /// <param name="destinationProperty"></param>
-        public void AddColumn(string name,                                          
-                              Expression<Func<TEntity, string>> destinationProperty)
+        public void AddColumn(string name,                                      
+                                      Expression<Func<Dictionary<string, object>, string>> destinationProperty)
 
         {
-            _columnMappings.Add(new ColumnMapping(name, destinationProperty));
+            _columnMappings.Add(new ColumnMapping<string>(name, destinationProperty));
         }
 
         public void Delete()
@@ -84,7 +70,7 @@ namespace CFCSV.Writer
         /// Writes rows
         /// </summary>
         /// <param name="entities"></param>
-        public void Write(IEnumerable<TEntity> entities)
+        public void Write(IEnumerable<Dictionary<string, object>> entities)
         {
             /*
             // Delete exising file
@@ -125,14 +111,14 @@ namespace CFCSV.Writer
         //    Write(new[] { entity });   
         //}
 
-        private string GetLineValues(TEntity entity)
+        private string GetLineValues(Dictionary<string, object> entity)
         {
             var line = new StringBuilder("");
 
             foreach (IColumnMapping columnMapping in _columnMappings)
             {
                 if (line.Length > 0) line.Append(Delimiter);
-                var value = columnMapping.GetValue(entity);
+                var value = columnMapping.GetValue<Dictionary<string, object>>(entity);
                 line.Append(value);
             }
 

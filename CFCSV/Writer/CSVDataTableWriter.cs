@@ -1,10 +1,6 @@
 ﻿using CFCSV.Models;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CFCSV.Writer
 {
@@ -19,25 +15,25 @@ namespace CFCSV.Writer
         /// <param name="dataTable"></param>
         /// <param name="csvSettings"></param>
         public void Write(DataTable dataTable, CSVSettings csvSettings)
-        {
-            if (File.Exists(csvSettings.Filename))
-            {
-                File.Delete(csvSettings.Filename);
-            }
+        {            
+            var isWriteHeader = !System.IO.File.Exists(csvSettings.Filename);
 
             using (StreamWriter writer = new StreamWriter(File.OpenWrite(csvSettings.Filename), csvSettings.Encoding))
             {
-                // Write headers
-                StringBuilder line = new StringBuilder("");
-                for (int columnIndex = 0; columnIndex < csvSettings.Columns.Count; columnIndex++)
+                // Write headers               
+                if (isWriteHeader)
                 {
-                    if (line.Length > 0)
+                    StringBuilder line = new StringBuilder("");
+                    for (int columnIndex = 0; columnIndex < csvSettings.Columns.Count; columnIndex++)
                     {
-                        line.Append(csvSettings.Delimiter);
+                        if (line.Length > 0)
+                        {
+                            line.Append(csvSettings.Delimiter);
+                        }
+                        line.Append(csvSettings.Columns[columnIndex].Name);
                     }
-                    line.Append(csvSettings.Columns[columnIndex].Name);
+                    writer.WriteLine(line.ToString());
                 }
-                writer.WriteLine(line.ToString());
 
                 // Write rows
                 for (int rowIndex = 0; rowIndex < dataTable.Rows.Count; rowIndex++)
@@ -66,27 +62,6 @@ namespace CFCSV.Writer
             }
             return line.ToString();
         }
-
-        //private string GetRowFromObject<T>(T item, CSVSettings csvSettings,
-        //                        Func<T, List<object>> functionGetColumnValues)
-        //{
-        //    StringBuilder line = new StringBuilder("");
-
-        //    var columnValues = functionGetColumnValues(item);
-
-        //    for (int columnIndex = 0; columnIndex < csvSettings.Columns.Count; columnIndex++)
-        //    {
-        //        var column = csvSettings.Columns[columnIndex];
-        //        if (line.Length > 0)
-        //        {
-        //            line.Append(csvSettings.Delimiter);
-        //        }
-
-        //        string columnValueString = GetColumnValue(columnValues[columnIndex], column);
-        //        line.Append(columnValueString);
-        //    }
-        //    return line.ToString();
-        //}
 
         private string GetColumnValue(object value, CSVColumn csvColumn)
         {
