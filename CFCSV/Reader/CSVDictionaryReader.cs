@@ -11,7 +11,7 @@ namespace CFCSV.Reader
     /// <summary>
     /// Reads CSV and returns Dictionary per row, key is column name
     /// </summary>
-    public class CSVDictionaryReader
+    public class CSVDictionaryReader : CSVReaderBase
     {
         private interface IPropertyMapping
         {
@@ -74,8 +74,15 @@ namespace CFCSV.Reader
         public string File { get; set; } = string.Empty;
         public char Delimiter { get; set; } = (char)9;
         public Encoding Encoding { get; set; } = Encoding.UTF8;
-
-        public IEnumerable<Dictionary<string, object>> Read(Expression<Func<Dictionary<string, object>>> createEntity)
+        
+        /// <summary>
+        /// Reads CSV rows and returns Dictionary[string, object] for each row.
+        /// </summary>
+        /// <param name="createEntity">Function to create default Dictionary</param>
+        /// <param name="maxRows">Max rows to return (null=No limit)</param>
+        /// <returns></returns>
+        public IEnumerable<Dictionary<string, object>> Read(Expression<Func<Dictionary<string, object>>> createEntity,
+                                                          int? maxRows = null)
         {
             //var items = new List<Dictionary<string, object>>();
 
@@ -87,7 +94,9 @@ namespace CFCSV.Reader
 
                 var createEntityFunction = createEntity.Compile();
 
-                while (!reader.EndOfStream)
+                var gotAllRequiredRows = false;
+                while (!reader.EndOfStream &&
+                    !gotAllRequiredRows)
                 {
                     lineCount++;
 
@@ -112,12 +121,11 @@ namespace CFCSV.Reader
 
                         yield return entity;
 
-                        //items.Add(entity);
+                        // Abort if row limit reached
+                        if (maxRows != null && lineCount - 1 >= maxRows) gotAllRequiredRows = true;                        
                     }
                 }
-            }
-
-            //return items;
+            }            
         }
 
         /// <summary>

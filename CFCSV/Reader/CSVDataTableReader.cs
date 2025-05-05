@@ -7,7 +7,7 @@ namespace CFCSV.Reader
     /// <summary>
     /// Reads CSV in to DataTable
     /// </summary>
-    public class CSVDataTableReader
+    public class CSVDataTableReader : CSVReaderBase
     {
         /// <summary>
         /// Reads CSV and returns a DataTable. Requires csvSettings to know the columns.

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace CFCSV.Writer
 {
     /// <summary>
-    /// CSV for dictionary objects. Each row is a Dictionary<string, object>
+    /// Writes CSV with row as Dictionary object
     /// </summary>
     public class CSVDictionaryWriter
     {
@@ -52,7 +52,7 @@ namespace CFCSV.Writer
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         public void AddColumn(string name,                                      
-                                      Expression<Func<Dictionary<string, object>, string>> destinationProperty)
+                              Expression<Func<Dictionary<string, object>, string>> destinationProperty)
 
         {
             _columnMappings.Add(new ColumnMapping<string>(name, destinationProperty));

@@ -158,9 +158,17 @@ namespace CFCSV.Utilities
             return columnValues;
         }
 
+        /// <summary>
+        /// Gets delimiter for line
+        /// 
+        /// It's recommended to just call this against the header because row lines might contain these characters within
+        /// quoted values.
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public static Char? GetDelimiter(string line)
         {
-            List<Char> delimiters = new List<char>() { (Char)9, ',', '|', '#' };
+            List<Char> delimiters = new List<char>() { (Char)9, ',', '|', '#', ';' };
             for (int index = 0; index < line.Length; index++)
             {
                 int delimiterIndex = delimiters.IndexOf(line[index]);
@@ -170,6 +178,6 @@ namespace CFCSV.Utilities
                 }
             }
             return null;
-        }
+        }    
     }
 }

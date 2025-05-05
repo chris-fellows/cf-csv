@@ -8,7 +8,7 @@ namespace CFCSV.Reader
     /// <summary>
     /// Reads CSV to list of type T
     /// </summary>
-    public class CSVEntityReader<TEntity>
+    public class CSVEntityReader<TEntity> : CSVReaderBase
     {
         private interface IPropertyMapping
         {            
@@ -60,27 +60,30 @@ namespace CFCSV.Reader
 
         public string File { get; set; } = string.Empty;
         public char Delimiter { get; set; } = (char)9;
-        public Encoding Encoding { get; set; } = Encoding.UTF8;       
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         /// <summary>
-        /// Reads CSV. Method either returns list of entities
+        /// Reads CSV rows and returns TEntity for each row
         /// </summary>
-        /// <param name="createEntity"></param>
-        /// <param name="enumerateAction"></param>
+        /// <param name="createEntity">Function to create default entity</param>
+        /// <param name="maxRows">Max rows to return (null=No limit)</param>
         /// <returns></returns>
-        public IEnumerable<TEntity> Read(Expression<Func<TEntity>> createEntity)                                  
+        public IEnumerable<TEntity> Read(Expression<Func<TEntity>> createEntity,
+                                        int? maxRows = null)
         {
             //List<TEntity> items = new List<TEntity>();
 
             using (StreamReader reader = new StreamReader(File))
             {
                 int lineCount = 0;
-                var headers = new List<string>();
-                const Char quotes = '"';
+                var headers = new List<string>();                
+                const Char quotes = '"';                
 
                 var createEntityFunction = createEntity.Compile();
 
-                while (!reader.EndOfStream)
+                var gotAllRequiredRows = false;
+                while (!reader.EndOfStream &&
+                    !gotAllRequiredRows)
                 {
                     lineCount++;
 
@@ -104,13 +107,12 @@ namespace CFCSV.Reader
                         }
 
                         yield return entity;
-                                                
-                        //items.Add(entity);                        
+
+                        // Abort if row limit reached
+                        if (maxRows != null && lineCount - 1 >= maxRows) gotAllRequiredRows = true;                        
                     }
                 }
-            }
-
-            //return items;
+            }            
         }      
 
         /// <summary>
