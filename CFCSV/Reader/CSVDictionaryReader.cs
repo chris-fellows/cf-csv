@@ -53,19 +53,8 @@ namespace CFCSV.Reader
                 var valuesFunction = ValuesProperty.Compile();
                 var propertyValue = valuesFunction(headers, values);
 
-                // Set entity property
-                //var result = EntityProperty.Compile();
-                //var item = result();
-                entity[DictionaryKey] = propertyValue;
-
-                //var propertyCompiled = EntityProperty.Compile();
-                //var result= propertyCompiled.Invoke(entity);
-                //result = propertyValue;
-
-                int xxx = 1000;
-
-                //var entityPropertyInfo = EntityProperty.GetPropertyInfo();
-                //entityPropertyInfo.SetValue(entity, (TMySourceType)propertyValue);
+                // Set entity property                
+                entity[DictionaryKey] = propertyValue;                
             }
         }
 
